@@ -1,5 +1,5 @@
 ##
-# Copyright (c) 2005 Apple Computer, Inc. All rights reserved.
+# Copyright (c) 2006 Apple Computer, Inc. All rights reserved.
 #
 # @APPLE_LICENSE_HEADER_START@
 # 
@@ -24,23 +24,15 @@ TESTROOT = ../..
 include ${TESTROOT}/include/common.makefile
 
 run: all
-	./main
+	export DYLD_INSERT_LIBRARIES=/ && export DYLD_PRINT_LIBRARIES=/ &&  export DYLD_PREBIND_DEBUG=/ && ./main
 
-all: main 
+all: main
 
-main : main.c libfoo.dylib
-	${CC} ${CCFLAGS} -I${TESTROOT}/include -o main main.c libfoo.dylib 
-
-
-libfoo.dylib : foo.c libbar.dylib
-	export MACOSX_DEPLOYMENT_TARGET=10.2 && ${CC} ${CCFLAGS} -dynamiclib foo.c -o libfoo.dylib libbar.dylib -flat_namespace -prebind -seg1addr 20000
-
-
-libbar.dylib : bar.c
-	export MACOSX_DEPLOYMENT_TARGET=10.2 && ${CC} ${CCFLAGS} -dynamiclib bar.c -o libbar.dylib -prebind -seg1addr 30000
-
-
+main: main.c
+	${CC} ${CCFLAGS} -I${TESTROOT}/include -o main main.c
+	sudo chown root main
+	sudo chmod 4755 main
 
 clean:
-	${RM} ${RMFLAGS} *~ main libbar.dylib libfoo.dylib
+	${RM} ${RMFLAGS} *~ main
 

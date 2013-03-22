@@ -23,24 +23,24 @@
 TESTROOT = ../..
 include ${TESTROOT}/include/common.makefile
 
+ifeq "-arch ppc" "$(ARCH)"
+	CXX_VERSION = g++-3.3 
+else 
+	CXX_VERSION = ${CXX} 
+endif
+
 run: all
 	./main
 
-all: main 
+all: main test.bundle
 
-main : main.c libfoo.dylib
-	${CC} ${CCFLAGS} -I${TESTROOT}/include -o main main.c libfoo.dylib 
+main : main.c
+	${CC} ${CCFLAGS} -I${TESTROOT}/include -o main main.c
 
-
-libfoo.dylib : foo.c libbar.dylib
-	export MACOSX_DEPLOYMENT_TARGET=10.2 && ${CC} ${CCFLAGS} -dynamiclib foo.c -o libfoo.dylib libbar.dylib -flat_namespace -prebind -seg1addr 20000
-
-
-libbar.dylib : bar.c
-	export MACOSX_DEPLOYMENT_TARGET=10.2 && ${CC} ${CCFLAGS} -dynamiclib bar.c -o libbar.dylib -prebind -seg1addr 30000
-
-
+test.bundle : bundle.cxx
+	${CC} ${CXXFLAGS} -bundle -o test.bundle bundle.cxx
 
 clean:
-	${RM} ${RMFLAGS} *~ main libbar.dylib libfoo.dylib
+	${RM} ${RMFLAGS} *~ main test.bundle
+
 
