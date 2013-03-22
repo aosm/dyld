@@ -22,40 +22,27 @@
  */
 #include <stdio.h>  // fprintf(), NULL
 #include <stdlib.h> // exit(), EXIT_SUCCESS
-#include <string.h>
 #include <dlfcn.h>
-#include <pthread.h>
 
 #include "test.h" // PASS(), FAIL(), XPASS(), XFAIL()
 
+// foo() internally calls bar()
+// libfoobar.dylib is build flat with bar() that is private_extern
+// The bar() in the main executable should not override the one in libfoobar
 
-///
-/// This tests that the dlerror message is cleared when dlerror is called
-///
+extern int foo();
 
 int main()
 {
-	// try to non-existent library
-	void* handle1 = dlopen("frobulite", RTLD_LAZY);
-	if ( handle1 != NULL ) {
-		FAIL("dlerror-clear: dlopen(\"frobulite\", RTLD_LAZY) succeeded but should have failed");
-		exit(0);
-	}
-	
-	// verify there is an error message
-	const char* msg = dlerror();
-	if ( msg == NULL ) {
-		FAIL("dlerror-clear: dlerror() returned NULL but should have returned an error message");
-		exit(0);
-	}
-	
-	// verify error message was cleared
-	const char* msg2 = dlerror();
-	if ( msg2 != NULL ) {
-		FAIL("dlerror-clear: dlerror() returned message but should have returned NULL");
-		exit(0);
-	}
-	
-	PASS("dlerror-clear");
+	if ( foo() == 0 )
+		FAIL("flat-private-extern found wrong bar");
+	else
+		PASS("flat-private-extern");
+
+	return EXIT_SUCCESS;
+}
+
+int bar()
+{
 	return 0;
 }

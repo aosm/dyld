@@ -1,5 +1,5 @@
 ##
-# Copyright (c) 2005 Apple Computer, Inc. All rights reserved.
+# Copyright (c) 2006 Apple Computer, Inc. All rights reserved.
 #
 # @APPLE_LICENSE_HEADER_START@
 # 
@@ -23,16 +23,30 @@
 TESTROOT = ../..
 include ${TESTROOT}/include/common.makefile
 
+DYLIB_BASES_ADDRESS = 0x10000000
+
+ifeq "-arch ppc64" "$(ARCH)"
+	DYLIB_BASES_ADDRESS = 0x300000000
+else 
+	ifeq "-arch x86_64" "$(ARCH)"
+		DYLIB_BASES_ADDRESS = 0x300000000
+	endif
+endif
+
+
+
 run: all
 	./main
 
 all: main 
 
-main : main.c
-	${CC} ${CCFLAGS} -I${TESTROOT}/include -o main main.c
+main: main.c libfoo.dylib
+	${CC} ${CCFLAGS} -I${TESTROOT}/include -o main main.c libfoo.dylib
 
+libfoo.dylib: foo.c
+	${CC} ${CCFLAGS} -dynamiclib -o libfoo.dylib foo.c -seg1addr ${DYLIB_BASES_ADDRESS} -mmacosx-version-min=10.5
 
 
 clean:
-	${RM} ${RMFLAGS} *~ main
+	${RM} ${RMFLAGS} *~ main libfoo.dylib
 

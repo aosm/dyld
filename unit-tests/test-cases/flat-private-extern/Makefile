@@ -1,5 +1,5 @@
 ##
-# Copyright (c) 2005 Apple Computer, Inc. All rights reserved.
+# Copyright (c) 2006 Apple Computer, Inc. All rights reserved.
 #
 # @APPLE_LICENSE_HEADER_START@
 # 
@@ -26,19 +26,18 @@ include ${TESTROOT}/include/common.makefile
 run: all
 	./main
 
-all: main libfoo.dylib 
+all: main 
 
-main : main.c libbar.dylib
-	${CC} ${CCFLAGS} -I${TESTROOT}/include main.c libbar.dylib -o main 
+main : main.c libfoobar.dylib
+	${CC} ${CCFLAGS} -I${TESTROOT}/include -o main main.c libfoobar.dylib 
 
 
-libfoo.dylib : foo.c
-	${CC} ${CCFLAGS} -dynamiclib foo.c -o libfoo.dylib
+libfoobar.dylib : foo.c bar.c
+	${CC} ${CCFLAGS} -dynamiclib foo.c bar.c -o libfoobar.dylib -flat_namespace 
 
-libbar.dylib : bar.c
-	${CC} ${CCFLAGS} -dynamiclib bar.c -o libbar.dylib
+
 
 
 clean:
-	${RM} ${RMFLAGS} *~ main libfoo.dylib libbar.dylib
+	${RM} ${RMFLAGS} *~ main libfoobar.dylib
 

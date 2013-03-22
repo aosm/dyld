@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005 Apple Computer, Inc. All rights reserved.
+ * Copyright (c) 2006 Apple Computer, Inc. All rights reserved.
  *
  * @APPLE_LICENSE_HEADER_START@
  * 
@@ -22,30 +22,17 @@
  */
 #include <stdio.h>  // fprintf(), NULL
 #include <stdlib.h> // exit(), EXIT_SUCCESS
-#include <dlfcn.h>
-#include <stdbool.h>
+#include <stdbool.h> 
+
 #include "test.h" // PASS(), FAIL(), XPASS(), XFAIL()
 
-// foo() internally calls bar()
-// libfoo.dylib is build flat and prebound to libbar.dylib
-// but the bar in this main executable should override the prebound bar
-extern bool foo();
+extern bool checkRebasing();
 
-int main()
+int main(int argc, const char* argv[])
 {
-	if ( foo() )
-		PASS("flat-prebound");
+	if ( checkRebasing() ) 
+		PASS("prebased-performance");
 	else
-		FAIL("flat-prebound found wrong bar");
-
+		FAIL("prebased-performance");
 	return EXIT_SUCCESS;
 }
-
-
-int bar()
-{
-	return 0;
-}
-int barVar = 0;
-int barVar2 = 0;
-
